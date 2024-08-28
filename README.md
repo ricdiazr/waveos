@@ -4,7 +4,7 @@ Audio and Sound control platform aims to provide an OSC based interface to inter
 #
 
 <div hidden>
-```
+
 @startuml wavesOS_system
 !define SPRITESURL https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master
 !define ICONURL https://raw.githubusercontent.com/Roemer/plantuml-office/master/icons
@@ -31,7 +31,7 @@ Rel(soundSystem, soundEngine, "Generates sound")
 BiRel(audioController, audioInterface, "IO")
 BiRel(audioInterface, soundEngine, "IO")
 @enduml
-```
+
 </div>
 
 ![](wavesOS_system.svg)
