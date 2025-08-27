@@ -1,0 +1,9 @@
+[package]
+name = "osc"
+version = "0.1.0"
+
+[dependencies]
+log = { version = "0.4", features = ["std"] }
+
+[lib]
+crate-type = ["lib", "staticlib", "cdylib"]

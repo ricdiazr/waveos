@@ -1,0 +1,49 @@
+@startuml
+!define SPRITESURL https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master
+!define ICONURL https://raw.githubusercontent.com/Roemer/plantuml-office/master/icons
+
+!includeurl SPRITESURL/C4_Context.puml
+!includeurl SPRITESURL/C4_Container.puml
+!includeurl SPRITESURL/C4_Component.puml
+
+' LAYOUT_TOP_DOWN()
+' LAYOUT_AS_SKETCH()
+
+AddElementTag("microService", $shape=EightSidedShape(), $bgColor="CornflowerBlue", $fontColor="white", $legendText="micro service\neight sided")
+AddElementTag("greybox",  $bgColor="lightgrey", $fontColor="white", $legendText="ext")
+AddRelTag("async", $textColor="grey", $lineColor="grey", $lineStyle = DashedLine())
+
+SHOW_PERSON_OUTLINE()
+LAYOUT_WITH_LEGEND()
+
+title System Context diagram for WavesOS System
+
+Container_Ext(wosc, "wosc-app", "Receives/Processes sound control signals OSC")
+
+Container_Boundary(woscd,"waveos"){
+  Component(sign, "Sign In Controller", "Address Space", "Allows topics to sign in to the OSC routing system")
+  Component(dispatcher, "OSC message dispatcher", "API", "wrtites OSC messages to topics")
+  Container(wossys, "system-service", "description and system calls procecssing",$tags="microService")
+  Container(audioController, "Audio Controller", "representation, processing, and reproduction of sound", "audio-controller.png")
+  Container(soundEngine, "Sound Engine Controller", "Generates sound effects", "sound-engine.png")
+  
+  Container(audioInterface, "Audio Interface", "Audio Device Connectivity", "audio-device.png")
+}
+
+System_Boundary(os,"OS"){
+  Container(pipewire, "pipewire", $tags="greybox")
+  Container(supercollider, "supercollider", $tags="greybox")
+}
+
+Rel(wosc, woscd, "Uses", "API")
+BiRel(dispatcher, sign, "API","Pub/Sub")
+Rel(dispatcher, audioController, "/au", "Pub/Sub",  $tags="async")
+BiRel(dispatcher, soundEngine, "/osc","Pub/Sub", $tags="async")
+BiRel(dispatcher, wossys, "/sys","Pub/Sub", $tags="async")
+
+Rel(soundEngine, supercollider, "UDP","OSC")
+BiRel(wossys, os, "System Gateway Interface","WAGI")
+BiRel(audioInterface, pipewire, "IO","API")
+BiRel(pipewire, supercollider,"")
+Rel(audioController, audioInterface, "Amplification/ Signal Routing and Mixing / EQ")
+@enduml

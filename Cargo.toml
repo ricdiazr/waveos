@@ -1,0 +1,7 @@
+[workspace]
+members = [ "osc" ,"app"]
+edition = "2021"
+#exclude = [ "fuzz", "tools/http3_test" ]
+
+[profile.release]
+debug = true

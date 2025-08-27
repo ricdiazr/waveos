@@ -1,0 +1,41 @@
+@startuml
+!define SPRITESURL https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master
+!define ICONURL https://raw.githubusercontent.com/Roemer/plantuml-office/master/icons
+
+!includeurl SPRITESURL/C4_Context.puml
+!includeurl SPRITESURL/C4_Container.puml
+!includeurl SPRITESURL/C4_Component.puml
+
+' LAYOUT_TOP_DOWN()
+' LAYOUT_AS_SKETCH()
+
+AddElementTag("microService", $shape=EightSidedShape(), $bgColor="CornflowerBlue", $fontColor="white", $legendText="micro service\neight sided")
+AddElementTag("greybox",  $bgColor="lightgrey", $fontColor="white", $legendText="ext")
+AddRelTag("async", $textColor="grey", $lineColor="grey", $lineStyle = DashedLine())
+
+LAYOUT_WITH_LEGEND()
+
+title Component diagram for WavesOS Dispatcher Service
+
+Container_Ext(wosc, "wosc-app", "Processes sound control signals OSC")
+
+Container_Boundary(woscd,"OSC Dispatcher") {
+  Component(recv, "OSC packet receiver", "Rust", "receives OSC packets")
+  Component(sign, "Sign In Controller", "webassembly", "Allows OSC containers to sign in/off to the command broker")
+  Component(scheduler, "Scheduler", "Produces Commands", "assings commands for processing")
+  Component(bus, "OSC Command Bus", "Topics", "broadcasts OSC commands")
+  Component(mon, "Monitor", "Rust", "commands process monitor")
+  Component(address, "Address Space", "Rust", "OSC container tree structure")
+  Component(broker, "Command Broker", "FiFo", "delivers commands for execution")
+}
+
+Rel(wosc, recv, "OSC Packets", "API")
+Rel(wosc, sign, "Sign in Containers", "API")
+Rel(recv, scheduler, "OSCMessage", "API",  $tags="async")
+Rel(scheduler, bus, "writes", "OSC Command")
+Rel(mon, bus, "Consumer", "OSC Command")
+Rel(sign, broker, "registers", "OSC topics(method)")
+Rel(sign, address, "registers", "OSC container")
+Rel(broker, address, "matches", "OSC container")
+BiRel(broker, bus, "Consume/Produce", "OSC command")
+@enduml
